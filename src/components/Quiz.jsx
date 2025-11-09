@@ -4,17 +4,34 @@ import quizCompleteImg from "../assets/quiz-complete.png";
 import QuestionTimer from "./QustionTimer";
 
 export default function Quiz() {
+  const [answerState, setAnswerState] = useState("");
   const [userAnswers, setUserAnswers] = useState([]);
-  const timeout = 15000;
-  const activeQustionIndex = userAnswers.length;
+  const timeout = 10000;
+  const activeQustionIndex =
+    answerState === "" ? userAnswers.length : userAnswers.length - 1;
 
   const quizIsComplete = activeQustionIndex === QUSTIONS.length;
 
-  const handleSelectAnswer = useCallback((answer) => {
-    setUserAnswers((preState) => {
-      return [...preState, answer];
-    });
-  }, []);
+  const handleSelectAnswer = useCallback(
+    (selectedAnswer) => {
+      setAnswerState("answered");
+      setUserAnswers((preState) => {
+        return [...preState, selectedAnswer];
+      });
+
+      setTimeout(() => {
+        if (selectedAnswer === QUSTIONS[activeQustionIndex].answers[0]) {
+          setAnswerState("correct");
+        } else {
+          setAnswerState("wrong");
+        }
+        setTimeout(() => {
+          setAnswerState("");
+        }, 2000);
+      }, 1000);
+    },
+    [activeQustionIndex]
+  );
 
   console.log(userAnswers);
 
@@ -31,27 +48,50 @@ export default function Quiz() {
       </div>
     );
   }
-  const shuffedAnswers = [...QUSTIONS[activeQustionIndex].answers];
-  shuffedAnswers.sort(() => Math.random() - 0.5);
+  const shuffledAnswers = [...QUSTIONS[activeQustionIndex].answers];
+  shuffledAnswers.sort(() => Math.random() - 0.5);
 
   return (
     <div id="quiz">
       <div id="qustion">
-        <QuestionTimer timeout={10000} onTimeout={handleSkipAnswer} />
+        <QuestionTimer
+          key={activeQustionIndex}
+          timeout={timeout}
+          onTimeout={handleSkipAnswer}
+        />
         <h2>{QUSTIONS[activeQustionIndex].text}</h2>
         <ul id="answers">
-          {QUSTIONS[activeQustionIndex].answers.map((answer) => (
-            <li key={answer} className="answer">
-              <button onClick={() => handleSelectAnswer(answer)}>
-                {answer}
-              </button>
-            </li>
-          ))}
+          {shuffledAnswers.map((answer) => {
+            const isSelected = userAnswers[userAnswers.length - 1] === answer;
+            let cssClasses = "";
+
+            if (answerState === "answered" && isSelected) {
+              cssClasses = "selected";
+            }
+            if (
+              answerState === "correct" ||
+              (answerState === "wrong" && isSelected)
+            ) {
+              cssClasses = answerState;
+            }
+
+            return (
+              <li key={answer} className="answer">
+                <button
+                  onClick={() => handleSelectAnswer(answer)}
+                  className={cssClasses}
+                >
+                  {answer}
+                </button>
+              </li>
+            );
+          })}
         </ul>
       </div>
     </div>
   );
 }
 
+// key={activeQustionIndex} -- варто знати
 //  1-Зробити прогрес барр внизу форми з прогресом на 15 секунд
 // Якщо час вийшов то переходимо до наступного питання
