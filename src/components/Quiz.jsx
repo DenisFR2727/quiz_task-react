@@ -1,11 +1,9 @@
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useState } from "react";
 import QUSTIONS from "../qustions";
 import quizCompleteImg from "../assets/quiz-complete.png";
-import QuestionTimer from "./QustionTimer";
-import Answers from "./Answers";
+import Qustion from "./Qustion";
 
 export default function Quiz() {
-  const shuffledAnswers = useRef();
   const [answerState, setAnswerState] = useState("");
   const [userAnswers, setUserAnswers] = useState([]);
 
@@ -36,7 +34,7 @@ export default function Quiz() {
     [activeQustionIndex]
   );
 
-  console.log(userAnswers);
+  //   console.log(xccc);
 
   const handleSkipAnswer = useCallback(
     () => handleSelectAnswer(null),
@@ -51,26 +49,25 @@ export default function Quiz() {
       </div>
     );
   }
-  if (!shuffledAnswers.current) {
-    shuffledAnswers.current = [...QUSTIONS[activeQustionIndex].answers];
-    shuffledAnswers.current.sort(() => Math.random() - 0.5);
-  }
 
   return (
     <div id="quiz">
-      <div id="qustion">
-        <QuestionTimer
-          key={activeQustionIndex}
-          timeout={timeout}
-          onTimeout={handleSkipAnswer}
-        />
-        <h2>{QUSTIONS[activeQustionIndex].text}</h2>
-        <Answers />
-      </div>
+      <Qustion
+        key={activeQustionIndex}
+        timeout={timeout}
+        qustionText={QUSTIONS[activeQustionIndex].text}
+        answers={QUSTIONS[activeQustionIndex].answers}
+        answerState={answerState}
+        selectedAnswer={userAnswers[userAnswers.length - 1]}
+        onSelectAnswer={handleSelectAnswer}
+        onSkipAnswer={handleSkipAnswer}
+      />
     </div>
   );
 }
 
-// key={activeQustionIndex} -- варто знати
+// key={activeQustionIndex} -- варто знати для того що б відтворити компонент або ж знищити . Це для компонента !  Окремий випадок
 //  1-Зробити прогрес барр внизу форми з прогресом на 15 секунд
 // Якщо час вийшов то переходимо до наступного питання
+
+// .eslintrc.cjs
