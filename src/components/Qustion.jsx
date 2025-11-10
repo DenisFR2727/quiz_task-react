@@ -1,26 +1,54 @@
-import Answers from "./Answers";
+import { useState } from "react";
+import QUSTIONS from "../qustions";
 import QuestionTimer from "./QustionTimer";
+import Answers from "./Answers";
 
 export default function Qustion({
+  index,
   timeout,
-  qustionText,
-  answers,
   onSelectAnswer,
-  selectedAnswer,
-  answerState,
   onSkipAnswer,
 }) {
+  const [answer, setAnswer] = useState({
+    selectedAnswer: "",
+    isCorrect: null,
+  });
+
+  function handleSelectAnswer(answer) {
+    setAnswer({
+      selectedAnswer: answer,
+      isCorrect: null,
+    });
+
+    setTimeout(() => {
+      setAnswer({
+        selectedAnswer: answer,
+        isCorrect: QUSTIONS[index].answers[0] === answer,
+      });
+      setTimeout(() => {
+        onSelectAnswer(answer);
+      }, 2000);
+    }, 1000);
+  }
+
+  let answerState = "";
+
+  if (answer.selectedAnswer && answer.isCorrect !== null) {
+    answerState = answer.isCorrect ? "correct" : "wrong";
+  } else if (answer.selectedAnswer) {
+    answerState = "answered";
+  }
+
   return (
     <div id="qustion">
       <QuestionTimer timeout={timeout} onTimeout={onSkipAnswer} />
-      <h2>{qustionText}</h2>
+      <h2>{QUSTIONS[index].text}</h2>
       <Answers
-        answers={answers}
-        selectedAnswer={selectedAnswer}
+        answers={QUSTIONS[index].answers}
+        selectedAnswer={answer.selectedAnswer}
         answerState={answerState}
-        onSelect={onSelectAnswer}
+        onSelect={handleSelectAnswer}
       />
     </div>
   );
 }
-// Qustion
