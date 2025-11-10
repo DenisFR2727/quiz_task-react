@@ -1,11 +1,14 @@
-import { useCallback, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import QUSTIONS from "../qustions";
 import quizCompleteImg from "../assets/quiz-complete.png";
 import QuestionTimer from "./QustionTimer";
+import Answers from "./Answers";
 
 export default function Quiz() {
+  const shuffledAnswers = useRef();
   const [answerState, setAnswerState] = useState("");
   const [userAnswers, setUserAnswers] = useState([]);
+
   const timeout = 10000;
   const activeQustionIndex =
     answerState === "" ? userAnswers.length : userAnswers.length - 1;
@@ -48,8 +51,10 @@ export default function Quiz() {
       </div>
     );
   }
-  const shuffledAnswers = [...QUSTIONS[activeQustionIndex].answers];
-  shuffledAnswers.sort(() => Math.random() - 0.5);
+  if (!shuffledAnswers.current) {
+    shuffledAnswers.current = [...QUSTIONS[activeQustionIndex].answers];
+    shuffledAnswers.current.sort(() => Math.random() - 0.5);
+  }
 
   return (
     <div id="quiz">
@@ -60,33 +65,7 @@ export default function Quiz() {
           onTimeout={handleSkipAnswer}
         />
         <h2>{QUSTIONS[activeQustionIndex].text}</h2>
-        <ul id="answers">
-          {shuffledAnswers.map((answer) => {
-            const isSelected = userAnswers[userAnswers.length - 1] === answer;
-            let cssClasses = "";
-
-            if (answerState === "answered" && isSelected) {
-              cssClasses = "selected";
-            }
-            if (
-              answerState === "correct" ||
-              (answerState === "wrong" && isSelected)
-            ) {
-              cssClasses = answerState;
-            }
-
-            return (
-              <li key={answer} className="answer">
-                <button
-                  onClick={() => handleSelectAnswer(answer)}
-                  className={cssClasses}
-                >
-                  {answer}
-                </button>
-              </li>
-            );
-          })}
-        </ul>
+        <Answers />
       </div>
     </div>
   );
