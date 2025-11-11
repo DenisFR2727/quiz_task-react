@@ -1,12 +1,12 @@
 import { useCallback, useState } from "react";
 import QUSTIONS from "../qustions";
-import quizCompleteImg from "../assets/quiz-complete.png";
+// import quizCompleteImg from "../assets/quiz-complete.png";
 import Qustion from "./Qustion";
+import Summary from "./Summary";
 
 export default function Quiz() {
   const [userAnswers, setUserAnswers] = useState([]);
 
-  const timeout = 10000;
   const activeQustionIndex = userAnswers.length;
   const quizIsComplete = activeQustionIndex === QUSTIONS.length;
 
@@ -22,12 +22,7 @@ export default function Quiz() {
   );
 
   if (quizIsComplete) {
-    return (
-      <div id="summary">
-        <img src={quizCompleteImg} alt="trophy icon" />
-        <h2>Quiz Completed!</h2>
-      </div>
-    );
+    return <Summary userAnswers={userAnswers} />;
   }
 
   return (
@@ -35,7 +30,6 @@ export default function Quiz() {
       <Qustion
         key={activeQustionIndex}
         index={activeQustionIndex}
-        timeout={timeout}
         onSelectAnswer={handleSelectAnswer}
         onSkipAnswer={handleSkipAnswer}
       />
